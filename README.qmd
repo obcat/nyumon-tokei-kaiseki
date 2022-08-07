@@ -1,7 +1,7 @@
 ---
 title: "入門統計解析 演習問題の R による解答例"
 author: "obcat"
-format: markdown_github
+format: gfm
 editor: source
 ---
 
