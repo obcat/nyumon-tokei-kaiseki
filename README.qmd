@@ -7,4 +7,66 @@ editor: source
 
 ## 概要
 
-WIP
+[入門統計解析 (新世社)](https://www.saiensu.co.jp/search/?isbn=978-4-88384-140-0&y=2009) 演習問題の R による解答例です。
+
+- 解答は間違っているかもしれません。
+- できるだけ tidyverse 圏で頑張りました:
+
+    ```{r}
+    #| message: false
+    
+    library(tidyverse)
+    ```
+
+- [公式のサポートページ](https://www.saiensu.co.jp/search/?isbn=978-4-88384-140-0&y=2009#support) よりダウンロードしたデータソースを利用しています:
+
+    ```{r}
+    if (!xfun::file_exists("data/data.xlsx")) {
+      curl::curl_download(
+        "https://www.saiensu.co.jp/book_support/978-4-88384-140-0/data.xlsx",
+        "data/data.xlsx"
+      )
+    }
+    ```
+
+
+## 問題 2.1
+
+### 1
+
+最小階級の下限を `700` 円、最大階級の上限を `3500` 円とし、階級幅を `400` とする:
+
+```{r}
+階級境界 <- seq(from = 700, to = 3500, by = 400)
+階級下限 <- 階級境界[-length(階級境界)]
+階級上限 <- 階級境界[-1]
+階級名 <- str_c(階級下限, 階級上限, sep = " ～ ")
+階級値 <- (階級下限 + 階級上限) / 2
+```
+
+度数分布表は:
+
+```{r}
+表2.1 <- readxl::read_excel("data/data.xlsx",
+                               sheet = "表2.1",
+                               range = "A2:C49")
+度数分布表 <- 表2.1 %>% 
+  group_by(
+    階級   = cut(`家賃(円）`, breaks = 階級境界, right = FALSE, labels = 階級名),
+    階級値 = cut(`家賃(円）`, breaks = 階級境界, right = FALSE, labels = 階級値),
+  ) %>% 
+  summarise(度数 = n(), .groups = "drop") %>% 
+  mutate(
+    累積度数     = cumsum(度数),
+    相対度数     = 度数 / sum(度数),
+    累積相対度数 = cumsum(相対度数),
+  )
+度数分布表
+```
+
+したがって、モードは:
+
+```{r}
+モード <- 度数分布表 %>% slice_max(度数) %>% pull(階級値) %>% as.character() %>% as.integer()
+モード
+```
