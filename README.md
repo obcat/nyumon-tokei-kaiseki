@@ -9,32 +9,23 @@ obcat
 演習問題の R による解答例です。
 
 -   解答は間違っているかもしれません。
-
 -   できるだけ tidyverse 圏で頑張りました:
 
-    ::: {.cell}
-
-    ``` r
-    library(tidyverse)
-    ```
-
-    :::
+``` r
+library(tidyverse)
+```
 
 -   [公式のサポートページ](https://www.saiensu.co.jp/search/?isbn=978-4-88384-140-0&y=2009#support)
     よりダウンロードしたデータソースを利用しています:
 
-    ::: {.cell}
-
-    ``` r
-    if (!xfun::file_exists("data/data.xlsx")) {
-      curl::curl_download(
-        "https://www.saiensu.co.jp/book_support/978-4-88384-140-0/data.xlsx",
-        "data/data.xlsx"
-      )
-    }
-    ```
-
-    :::
+``` r
+if (!xfun::file_exists("data/data.xlsx")) {
+  curl::curl_download(
+    "https://www.saiensu.co.jp/book_support/978-4-88384-140-0/data.xlsx",
+    "data/data.xlsx"
+  )
+}
+```
 
 ## 問題 2.1
 
