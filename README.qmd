@@ -126,3 +126,82 @@ ggplot(data = 度数分布表, mapping = aes(x = 階級値, y = 度数)) +
 ### 4
 
 あきたので (ry
+
+
+### 5
+
+#### (1)
+
+度数分布表:
+
+```{r}
+表2.6_前半 <- readxl::read_excel("data/data.xlsx",
+                               sheet = "表2.4, 表2.5, 表2.6",
+                               range = "I2:J52")
+表2.6_後半 <- readxl::read_excel("data/data.xlsx",
+                               sheet = "表2.4, 表2.5, 表2.6",
+                               range = "L2:M22")
+表2.6 <- bind_rows(表2.6_前半, 表2.6_後半)
+階級境界 <- seq(from = 70, to = 170, by = 10)
+階級下限 <- 階級境界[-length(階級境界)]
+階級上限 <- 階級境界[-1]
+階級名 <- str_c(階級下限, 階級上限, sep = " ～ ")
+階級値 <- (階級下限 + 階級上限) / 2
+度数分布表 <- 表2.6 %>% 
+  group_by(
+    階級   = cut(`血糖値 (mg/dL)`, breaks = 階級境界, right = FALSE, labels = 階級名),
+    階級値 = cut(`血糖値 (mg/dL)`, breaks = 階級境界, right = FALSE, labels = 階級値),
+  ) %>% 
+  summarise(度数 = n(), .groups = "drop") %>% 
+  mutate(
+    累積度数     = cumsum(度数),
+    相対度数     = 度数 / sum(度数),
+    累積相対度数 = cumsum(相対度数),
+  )
+度数分布表
+```
+
+ヒストグラム:
+
+```{r}
+ggplot(data = 度数分布表, mapping = aes(x = 階級値, y = 度数)) +
+  geom_col()
+```
+
+分布の形状についてのコメント: 単峰で右に歪んでいる。
+
+
+#### (2)
+
+度数分布表:
+
+```{r}
+表2.6 <- 表2.6 %>%
+  mutate(`log(血糖値 (mg/dL))` = log(`血糖値 (mg/dL)`))
+階級境界 <- seq(from = 4.3, to = 5.1, by = 0.1)
+階級下限 <- 階級境界[-length(階級境界)]
+階級上限 <- 階級境界[-1]
+階級名 <- str_c(階級下限, 階級上限, sep = " ～ ")
+階級値 <- (階級下限 + 階級上限) / 2
+度数分布表 <- 表2.6 %>% 
+  group_by(
+    階級   = cut(`log(血糖値 (mg/dL))`, breaks = 階級境界, right = FALSE, labels = 階級名),
+    階級値 = cut(`log(血糖値 (mg/dL))`, breaks = 階級境界, right = FALSE, labels = 階級値),
+  ) %>% 
+  summarise(度数 = n(), .groups = "drop") %>% 
+  mutate(
+    累積度数     = cumsum(度数),
+    相対度数     = 度数 / sum(度数),
+    累積相対度数 = cumsum(相対度数),
+  )
+度数分布表
+```
+
+ヒストグラム:
+
+```{r}
+ggplot(data = 度数分布表, mapping = aes(x = 階級値, y = 度数)) +
+  geom_col()
+```
+
+分布の歪みぐあいがマシになった気がする。
